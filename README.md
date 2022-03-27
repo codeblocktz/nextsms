@@ -18,4 +18,11 @@ To use this library import it into your working file using the following:
 import "github.com/codeblocktz/nextsms"
 ```
 
+## To do
+- [x] Update installation guide
+- [ ] Update usage with single sms implementation
+- [ ] Update usage with multiple sms implementation
+- [ ] Add examples
+- [ ] Contribution guide
+- [ ] Sms delivery status query
 
