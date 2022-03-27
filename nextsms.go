@@ -45,7 +45,47 @@ func (n SingleSms) Send(c *Credentials) (interface{}, bool) {
 	httpBody := bytes.NewBuffer(body)
 
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", BASE_URL, httpBody)
+	req, err := http.NewRequest("POST", BASE_URL+"/api/sms/v1/single", httpBody)
+
+	if err != nil {
+		fmt.Println(err)
+		return err, false
+	}
+
+	req.Header.Add("Authorization", "Basic "+basicAuth(c.Username, c.Password))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return err, false
+	}
+	defer res.Body.Close()
+
+	resp, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return err, false
+	}
+	fmt.Println(string(body))
+
+	return resp, true
+}
+
+func (n MultipleSms) Send(c *Credentials) (interface{}, bool) {
+
+	body, err := json.Marshal(n)
+
+	if err != nil {
+		fmt.Println(err)
+		return err, false
+	}
+
+	httpBody := bytes.NewBuffer(body)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", BASE_URL+"/api/sms/v1/text/multi", httpBody)
 
 	if err != nil {
 		fmt.Println(err)
