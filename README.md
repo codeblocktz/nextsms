@@ -25,4 +25,4 @@ import "github.com/codeblocktz/nextsms"
 - [ ] Add examples
 - [ ] Contribution guide
 - [ ] Sms delivery status query
-
+- [ ] Automated tests

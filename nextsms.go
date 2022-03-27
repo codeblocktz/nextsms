@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -29,6 +28,24 @@ type SingleSms struct {
 	From string `json:"from"`
 }
 
+type statusResponse struct {
+	groupId     int
+	groupName   string
+	id          int
+	name        string
+	description string
+}
+
+type messageResponse struct {
+	to       string
+	status   statusResponse
+	smsCount int
+}
+
+type NextSmsResponse struct {
+	messages messageResponse
+}
+
 type MultipleSms struct {
 	Messages []SingleSms `json:"messages"`
 }
@@ -45,7 +62,7 @@ func (n SingleSms) Send(c *Credentials) (interface{}, bool) {
 	httpBody := bytes.NewBuffer(body)
 
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", BASE_URL+"/api/sms/v1/single", httpBody)
+	req, err := http.NewRequest("POST", BASE_URL+"/api/sms/v1/text/single", httpBody)
 
 	if err != nil {
 		fmt.Println(err)
@@ -63,14 +80,13 @@ func (n SingleSms) Send(c *Credentials) (interface{}, bool) {
 	}
 	defer res.Body.Close()
 
-	resp, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-		return err, false
-	}
-	fmt.Println(string(body))
+	var result *NextSmsResponse
+	error := json.NewDecoder(res.Body).Decode(&result)
 
-	return resp, true
+	if res.StatusCode != 200 || error != nil {
+		return result, false
+	}
+	return result, true
 }
 
 func (n MultipleSms) Send(c *Credentials) (interface{}, bool) {
@@ -103,14 +119,13 @@ func (n MultipleSms) Send(c *Credentials) (interface{}, bool) {
 	}
 	defer res.Body.Close()
 
-	resp, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-		return err, false
-	}
-	fmt.Println(string(body))
+	var result *NextSmsResponse
+	error := json.NewDecoder(res.Body).Decode(&result)
 
-	return resp, true
+	if res.StatusCode != 200 || error != nil {
+		return result, false
+	}
+	return result, true
 }
 
 func basicAuth(username, password string) string {
